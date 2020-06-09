@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <title>Accept a card payment</title>
+  <meta name="description" content="A demo of a card payment on Stripe" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="stylesheet" href="global.css" />
+  <script src="https://js.stripe.com/v3/"></script>
+  <script src="/client.js" defer></script>
+</head>
+
+
+<body>
+  <form id="checkout-form">
+    <img src="images/lego.jpg" height="420" width="420">
+    <button type="button"
+      style="background-color:#6772E5;color:#FFF;padding:12px 12px;border:0;border-radius:4px;font-size:1em"
+      id="checkout-button-price_1Gry3rGpgmgKFpfQkfqOARWi" role="link">
+      Use Stripe checkout
+    </button>
+    <div id="error-message"></div>
+
+    <script>
+      (function () {
+        var stripe = Stripe('pk_test_qeCB5JktM9KoOTsl6HBlDBmJ00N2CxGDeZ');
+
+        var checkoutButton = document.getElementById('checkout-button-price_1Gry3rGpgmgKFpfQkfqOARWi');
+        checkoutButton.addEventListener('click', function () {
+          // When the customer clicks on the button, redirect
+          // them to Checkout.
+          stripe.redirectToCheckout({
+              lineItems: [{
+                price: 'price_1Gry3rGpgmgKFpfQkfqOARWi',
+                quantity: 1
+              }],
+              mode: 'payment',
+              // Do not rely on the redirect to the successUrl for fulfilling
+              // purchases, customers may not always reach the success_url after
+              // a successful payment.
+              // Instead use one of the strategies described in
+              // https://stripe.com/docs/payments/checkout/fulfillment
+              successUrl: 'https://your-website.com/success',
+              cancelUrl: 'https://your-website.com/canceled',
+            })
+            .then(function (result) {
+              if (result.error) {
+                // If `redirectToCheckout` fails due to a browser or network
+                // error, display the localized error message to your customer.
+                var displayError = document.getElementById('error-message');
+                displayError.textContent = result.error.message;
+              }
+            });
+        });
+      })();
+    </script>
+  </form>
+  <!-- Display a payment form -->
+  <form id="payment-form">
+    <img src="images/kai.jpg" height="420" width="420">
+    <div id="card-element">
+      <!--Stripe.js injects the Card Element-->
+    </div>
+    <button id="submit">
+      <div class="spinner hidden" id="spinner"></div>
+      <span id="button-text">Pay</span>
+    </button>
+    <p id="card-errors" role="alert"></p>
+    <p class="result-message hidden">
+      Payment succeeded, see the result in your
+      <a href="" target="_blank">Stripe dashboard.</a> Refresh the page to pay again.
+    </p>
+  </form>
+</body>
+
+</html>
